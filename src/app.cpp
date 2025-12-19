@@ -13,6 +13,7 @@
 
 using namespace std;
 using sort::BlockSorter;
+
 std::vector<int> App::generateRandomData(int n) const {
     std::vector<int> out;
     out.reserve(n);
@@ -44,15 +45,27 @@ static int readIntInRange(const string& prompt, int minVal, int maxVal) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
-        if (x < minVal || x > maxVal) {
-            cout << "Ошибка: число должно быть в диапазоне [" << minVal << ", " << maxVal << "]\n";
+
+        // Проверяем, что введено именно целое число и ничего лишнего
+        char next = cin.peek();
+        if (next != '\n' && next != EOF) {
+            // Во входе есть лишние символы
+            cout << "Ошибка: введены лишние символы. Попробуйте снова.\n";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
+
+        if (x < minVal || x > maxVal) {
+            cout << "Ошибка: число должно быть в диапазоне [" << minVal << ", " << maxVal << "]\n";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+
+        // Очищаем буфер от символа новой строки
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return x;
     }
 }
-
 // Валидация: чтение положительного целого (количество элементов)
 static int readPositiveInt(const string& prompt) {
     while (true) {
@@ -78,7 +91,7 @@ static bool askYesNo(const string& prompt) {
     while (true) {
         cout << prompt;
         string s;
-        if (! (cin >> s) ) {
+        if (!(cin >> s)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
@@ -134,9 +147,9 @@ int App::run() {
         vector<int> data;
         if (method == InputMethod::Keyboard) {
             cout << "Введите числа через пробел (можно дробные), завершите ввод пустой строкой:\n";
-            // читаем одну строку и парсим числа; если пустая строка - повторяем
             string line;
-            // не выполняем лишний getline; напрямую запрашиваем с "> " в начале
+            // Очищаем буфер перед началом ввода
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             while (true) {
                 cout << "> ";
                 if (!std::getline(cin, line)) break; // EOF
@@ -151,22 +164,52 @@ int App::run() {
                 }
                 if (!any) cout << "В строке не найдено чисел, попробуйте ещё раз или нажмите Enter для завершения.\n";
             }
-        } else if (method == InputMethod::Random) {
+        }
+        else if (method == InputMethod::Random) {
             int n = readPositiveInt("Введите количество элементов: ");
             data = generateRandomData(n);
-        } else if (method == InputMethod::File) {
+        }
+        else if (method == InputMethod::File) {
+
             cout << "Введите путь к файлу: ";
             string path;
-            // читаем путь с использованием getline, чтобы поддержать пробелы
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            if (!getline(cin, path)) { cout << "Ошибка чтения пути.\n"; continue; }
-            // validate file exists and readable
+            if (!getline(cin, path)) {
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Ошибка чтения пути.\n";
+                continue;
+            }
+
+            // Удаляем пробелы в начале и конце строки
+            path.erase(0, path.find_first_not_of(" \t\n\r\f\v"));
+            path.erase(path.find_last_not_of(" \t\n\r\f\v") + 1);
+
+            if (path.empty()) {
+                cout << "Путь к файлу не может быть пустым.\n";
+                continue;
+            }
+
+            // Открываем файл
             ifstream in(path);
-            if (!in) { cout << "Не удалось открыть файл: " << path << "\n"; continue; }
+            if (!in) {
+                cout << "Не удалось открыть файл: " << path << "\n";
+                continue;
+            }
+
+            // Читаем данные из файла
             data = readFromFile(path);
-            if (data.empty()) cout << "Файл пуст или не удалось загрузить числовые данные.\n";
-        } else {
+            if (data.empty()) {
+                cout << "Файл пуст или не удалось загрузить числовые данные.\n";
+                continue;
+            }
+        }
+        else {
             cout << "Неверный выбор\n";
+            continue;
+        }
+
+        // Если массив пустой, возвращаемся в меню
+        if (data.empty()) {
+            cout << "Массив пуст.\n";
             continue;
         }
 
@@ -182,20 +225,37 @@ int App::run() {
         bool save = askYesNo("Сохранить результат в файл? (y/n): ");
         if (save) {
             string outpath;
+            // Очищаем буфер перед вводом пути для сохранения
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             while (true) {
                 cout << "Введите путь для сохранения: ";
-                cin >> outpath;
+                if (!getline(cin, outpath)) {
+                    cout << "Ошибка чтения пути.\n";
+                    break;
+                }
+
+                // Удаляем пробелы в начале и конце строки
+                outpath.erase(0, outpath.find_first_not_of(" \t\n\r\f\v"));
+                outpath.erase(outpath.find_last_not_of(" \t\n\r\f\v") + 1);
+
+                if (outpath.empty()) {
+                    cout << "Путь для сохранения не может быть пустым.\n";
+                    continue;
+                }
+
                 if (isReservedWindowsName(outpath)) {
                     cout << "Ошибка: имя файла зарезервировано системой. Выберите другое имя.\n";
                     continue;
                 }
+
                 // попытка открыть для записи
-                ofstream test(outpath, ios::out | ios::app);
+                ofstream test(outpath, ios::out);
                 if (!test) {
                     cout << "Не удалось открыть файл для записи: " << outpath << "\n";
                     continue;
                 }
                 test.close();
+
                 // если всё OK, записываем
                 writeToFile(outpath, data);
                 cout << "Файл сохранён.\n";
@@ -204,11 +264,11 @@ int App::run() {
         }
 
         // После обработки пункта меню возвращаемся к меню
+        cout << "\n";
     }
 
     return 0;
 }
-
 std::vector<int> App::readFromFile(const std::string& path) const {
     std::vector<int> v;
     std::ifstream in(path);
