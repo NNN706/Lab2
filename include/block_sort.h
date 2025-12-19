@@ -2,14 +2,17 @@
 
 #include <vector>
 
-// Block sort (also called block merge or "library sort" variant) implementation
-// Provides sorting of integer vectors without using std::sort.
+// Блочная сортировка: модуль сортировки целых чисел.
+// Реализация в отдельном классе BlockSorter.
+// Не использует std::sort для основной сортировки (использует inplace_merge для слияния).
 
 namespace sort {
 
 class BlockSorter {
 public:
-    // Sort the vector in-place
+    // Сортирует вектор целых чисел на месте.
+    // Параметр:
+    //   data - ссылка на вектор, который будет отсортирован.
     static void sort(std::vector<int>& data);
 };
 
