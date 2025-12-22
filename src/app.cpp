@@ -22,9 +22,7 @@ std::vector<int> App::generateRandomData(int n) const {
     }
 
     for (int i = 0; i < n; ++i) {
-        // Генерация целых чисел в диапазоне [-1000, 1000]
-        int sign = (std::rand() % 2 == 0) ? 1 : -1;
-        int value = sign * (std::rand() % 1001); // 0..1000 со знаком
+        int value = (std::rand() % 2001) - 1000;
         out.push_back(value);
     }
     return out;
@@ -163,7 +161,7 @@ int App::run() {
                 bool any = false;
 
                 while (ss >> num) {
-                    int scaled = static_cast<int>(std::lround(num * 100.0));
+                    int scaled = static_cast<int>(num);
                     data.push_back(scaled);
                     any = true;
                 }
@@ -311,7 +309,7 @@ void App::writeToFile(const std::string& path,
     out << "Исходный массив (" << original.size() << " элементов):\n";
     for (size_t i = 0; i < original.size(); ++i) {
         if (i) out << " ";
-        double val = original[i] / 100.0;
+        double val = original[i];
         out << val;
     }
     out << "\n\n";
@@ -320,7 +318,7 @@ void App::writeToFile(const std::string& path,
     out << "Отсортированный массив:\n";
     for (size_t i = 0; i < sorted.size(); ++i) {
         if (i) out << " ";
-        double val = sorted[i] / 100.0;
+        double val = sorted[i];
         out << val;
     }
     out << "\n";
@@ -330,7 +328,7 @@ void App::printVector(const std::vector<int>& v) const {
     for (size_t i = 0; i < v.size(); ++i) {
         if (i) std::cout << " ";
         // Конвертируем обратно в дробное число для вывода
-        double val = v[i] / 100.0;
+        double val = v[i] / 1;
         std::cout << val;
     }
     std::cout << '\n';

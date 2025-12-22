@@ -130,6 +130,7 @@
     <None Include="Project2.manual.filters" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\app.cpp" />
     <ClCompile Include="..\src\block_sort.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
