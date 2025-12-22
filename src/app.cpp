@@ -1,11 +1,8 @@
-#include "../include/app.h"
+п»ї#include "../include/app.h"
 #include <iostream>
 #include <fstream>
-#include <random>
 #include <cmath>
-#include <iomanip>
 #include <sstream>
-#include <algorithm>
 #include <cctype>
 #include <limits>
 #include <ctime>
@@ -25,60 +22,59 @@ std::vector<int> App::generateRandomData(int n) const {
     }
 
     for (int i = 0; i < n; ++i) {
+        // Р“РµРЅРµСЂР°С†РёСЏ С†РµР»С‹С… С‡РёСЃРµР» РІ РґРёР°РїР°Р·РѕРЅРµ [-1000, 1000]
         int sign = (std::rand() % 2 == 0) ? 1 : -1;
-        int threeDigit = std::rand() % 900 + 100; // 100..999
-        int frac = std::rand() % 100; // 0..99 for fractional part
-        int value = sign * (threeDigit * 100 + frac); // store as integer = value*100
+        int value = sign * (std::rand() % 1001); // 0..1000 СЃРѕ Р·РЅР°РєРѕРј
         out.push_back(value);
     }
     return out;
 }
 
-// Валидация: чтение целого числа в диапазоне
+// Р’Р°Р»РёРґР°С†РёСЏ: С‡С‚РµРЅРёРµ С†РµР»РѕРіРѕ С‡РёСЃР»Р° РІ РґРёР°РїР°Р·РѕРЅРµ
 static int readIntInRange(const string& prompt, int minVal, int maxVal) {
     while (true) {
         cout << prompt;
         int x;
         if (!(cin >> x)) {
-            cout << "Ошибка ввода: ожидается целое число. Попробуйте снова.\n";
+            cout << "РћС€РёР±РєР° РІРІРѕРґР°: РѕР¶РёРґР°РµС‚СЃСЏ С†РµР»РѕРµ С‡РёСЃР»Рѕ. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
-        // Проверяем, что введено именно целое число и ничего лишнего
+        // РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ РІРІРµРґРµРЅРѕ РёРјРµРЅРЅРѕ С†РµР»РѕРµ С‡РёСЃР»Рѕ Рё РЅРёС‡РµРіРѕ Р»РёС€РЅРµРіРѕ
         char next = cin.peek();
         if (next != '\n' && next != EOF) {
-            // Во входе есть лишние символы
-            cout << "Ошибка: введены лишние символы. Попробуйте снова.\n";
+            // Р’Рѕ РІС…РѕРґРµ РµСЃС‚СЊ Р»РёС€РЅРёРµ СЃРёРјРІРѕР»С‹
+            cout << "РћС€РёР±РєР°: РІРІРµРґРµРЅС‹ Р»РёС€РЅРёРµ СЃРёРјРІРѕР»С‹. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
         if (x < minVal || x > maxVal) {
-            cout << "Ошибка: число должно быть в диапазоне [" << minVal << ", " << maxVal << "]\n";
+            cout << "РћС€РёР±РєР°: С‡РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ [" << minVal << ", " << maxVal << "]\n";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
-        // Очищаем буфер от символа новой строки
+        // РћС‡РёС‰Р°РµРј Р±СѓС„РµСЂ РѕС‚ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return x;
     }
 }
-// Валидация: чтение положительного целого (количество элементов)
+// Р’Р°Р»РёРґР°С†РёСЏ: С‡С‚РµРЅРёРµ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРіРѕ С†РµР»РѕРіРѕ (РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ)
 static int readPositiveInt(const string& prompt) {
     while (true) {
         cout << prompt;
         int x;
         if (!(cin >> x)) {
-            cout << "Ошибка ввода: ожидается целое число. Попробуйте снова.\n";
+            cout << "РћС€РёР±РєР° РІРІРѕРґР°: РѕР¶РёРґР°РµС‚СЃСЏ С†РµР»РѕРµ С‡РёСЃР»Рѕ. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
         if (x <= 0) {
-            cout << "Ошибка: введите положительное число.\n";
+            cout << "РћС€РёР±РєР°: РІРІРµРґРёС‚Рµ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРµ С‡РёСЃР»Рѕ.\n";
             continue;
         }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -86,7 +82,7 @@ static int readPositiveInt(const string& prompt) {
     }
 }
 
-// Валидация ответа yes/no
+// Р’Р°Р»РёРґР°С†РёСЏ РѕС‚РІРµС‚Р° yes/no
 static bool askYesNo(const string& prompt) {
     while (true) {
         cout << prompt;
@@ -96,16 +92,16 @@ static bool askYesNo(const string& prompt) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
-        // нормализуем
+        // РЅРѕСЂРјР°Р»РёР·СѓРµРј
         if (s.size() == 0) continue;
         char c = s[0];
-        if (c == 'y' || c == 'Y' || c == 'д' || c == 'Д') return true;
-        if (c == 'n' || c == 'N' || c == 'н' || c == 'Н') return false;
-        cout << "Ошибка: ожидается 'y'/'n' (или рус. 'д'/'н'). Попробуйте снова.\n";
+        if (c == 'y' || c == 'Y' || c == 'Рґ' || c == 'Р”') return true;
+        if (c == 'n' || c == 'N' || c == 'РЅ' || c == 'Рќ') return false;
+        cout << "РћС€РёР±РєР°: РѕР¶РёРґР°РµС‚СЃСЏ 'y'/'n' (РёР»Рё СЂСѓСЃ. 'Рґ'/'РЅ'). РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n";
     }
 }
 
-// Получить базовое имя файла (без пути и расширения)
+// РџРѕР»СѓС‡РёС‚СЊ Р±Р°Р·РѕРІРѕРµ РёРјСЏ С„Р°Р№Р»Р° (Р±РµР· РїСѓС‚Рё Рё СЂР°СЃС€РёСЂРµРЅРёСЏ)
 static string getBaseName(const string& path) {
     size_t pos = path.find_last_of("/\\");
     string name = (pos == string::npos) ? path : path.substr(pos + 1);
@@ -114,11 +110,11 @@ static string getBaseName(const string& path) {
     return name;
 }
 
-// Проверка, является ли имя файла зарезервированным в Windows
+// РџСЂРѕРІРµСЂРєР°, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РёРјСЏ С„Р°Р№Р»Р° Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅС‹Рј РІ Windows
 static bool isReservedWindowsName(const string& path) {
     string name = getBaseName(path);
     if (name.empty()) return true;
-    // убрать пробелы в конце и точки
+    // СѓР±СЂР°С‚СЊ РїСЂРѕР±РµР»С‹ РІ РєРѕРЅС†Рµ Рё С‚РѕС‡РєРё
     while (!name.empty() && (name.back() == ' ' || name.back() == '.')) name.pop_back();
     string up;
     up.reserve(name.size());
@@ -134,167 +130,208 @@ static bool isReservedWindowsName(const string& path) {
 
 int App::run() {
     while (true) {
-        cout << "Выберите способ ввода массива:\n";
-        cout << "1) Ввод с клавиатуры\n2) Генерация случайного массива\n3) Загрузка из файла\n4) Выход\n";
-        int maxChoice = static_cast<int>(InputMethod::Exit);
-        int choice = readIntInRange("Ваш выбор: ", static_cast<int>(InputMethod::Keyboard), maxChoice);
-        InputMethod method = static_cast<InputMethod>(choice);
-        if (method == InputMethod::Exit) {
-            cout << "Выход.\n";
-            break;
-        }
+        cout << "Р’С‹Р±РµСЂРёС‚Рµ СЃРїРѕСЃРѕР± РІРІРѕРґР° РјР°СЃСЃРёРІР°:\n";
+        cout << static_cast<int>(InputMethod::Keyboard) + 1 << ") Р’РІРѕРґ СЃ РєР»Р°РІРёР°С‚СѓСЂС‹\n";
+        cout << static_cast<int>(InputMethod::Random) + 1 << ") Р“РµРЅРµСЂР°С†РёСЏ СЃР»СѓС‡Р°Р№РЅРѕРіРѕ РјР°СЃСЃРёРІР°\n";
+        cout << static_cast<int>(InputMethod::File) + 1 << ") Р—Р°РіСЂСѓР·РєР° РёР· С„Р°Р№Р»Р°\n";
+        cout << static_cast<int>(InputMethod::Exit) + 1 << ") Р’С‹С…РѕРґ\n";
+
+        int minChoice = static_cast<int>(InputMethod::Keyboard) + 1;
+        int maxChoice = static_cast<int>(InputMethod::Exit) + 1;
+        int choice = readIntInRange("Р’Р°С€ РІС‹Р±РѕСЂ: ", minChoice, maxChoice);
+
+        InputMethod method = static_cast<InputMethod>(choice - 1);
 
         vector<int> data;
-        if (method == InputMethod::Keyboard) {
-            cout << "Введите числа через пробел (можно дробные), завершите ввод пустой строкой:\n";
+
+        switch (method) {
+        case InputMethod::Exit:
+            cout << "Р’С‹С…РѕРґ.\n";
+            return 0;
+
+        case InputMethod::Keyboard: {
+            cout << "Р’РІРµРґРёС‚Рµ С‡РёСЃР»Р° С‡РµСЂРµР· РїСЂРѕР±РµР» (РґРѕРїСѓСЃРєР°СЋС‚СЃСЏ РґСЂРѕР±РЅС‹Рµ), Р·Р°РІРµСЂС€РёС‚Рµ РІРІРѕРґ РїСѓСЃС‚РѕР№ СЃС‚СЂРѕРєРѕР№:\n";
             string line;
-            // Очищаем буфер перед началом ввода
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             while (true) {
                 cout << "> ";
-                if (!std::getline(cin, line)) break; // EOF
-                if (line.empty()) break; // завершение ввода по пустой строке
+                if (!std::getline(cin, line) || line.empty()) break;
+
                 stringstream ss(line);
-                double xd;
+                double num;
                 bool any = false;
-                while (ss >> xd) {
-                    int scaled = (int)lround(xd * 100.0);
+
+                while (ss >> num) {
+                    int scaled = static_cast<int>(std::lround(num * 100.0));
                     data.push_back(scaled);
                     any = true;
                 }
-                if (!any) cout << "В строке не найдено чисел, попробуйте ещё раз или нажмите Enter для завершения.\n";
-            }
-        }
-        else if (method == InputMethod::Random) {
-            int n = readPositiveInt("Введите количество элементов: ");
-            data = generateRandomData(n);
-        }
-        else if (method == InputMethod::File) {
 
-            cout << "Введите путь к файлу: ";
+                if (!any) {
+                    cout << "Р’ СЃС‚СЂРѕРєРµ РЅРµ РЅР°Р№РґРµРЅРѕ С‡РёСЃРµР», РїРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р· РёР»Рё РЅР°Р¶РјРёС‚Рµ Enter РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ.\n";
+                }
+            }
+            break;
+        }
+
+        case InputMethod::Random: {
+            int n = readPositiveInt("Р’РІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ: ");
+            data = generateRandomData(n);
+            break;
+        }
+
+        case InputMethod::File: {
+            cout << "Р’РІРµРґРёС‚Рµ РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ: ";
             string path;
+
+
             if (!getline(cin, path)) {
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Ошибка чтения пути.\n";
+                cout << "РћС€РёР±РєР° С‡С‚РµРЅРёСЏ РїСѓС‚Рё.\n";
                 continue;
             }
 
-            // Удаляем пробелы в начале и конце строки
             path.erase(0, path.find_first_not_of(" \t\n\r\f\v"));
             path.erase(path.find_last_not_of(" \t\n\r\f\v") + 1);
 
             if (path.empty()) {
-                cout << "Путь к файлу не может быть пустым.\n";
+                cout << "РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.\n";
                 continue;
             }
 
-            // Открываем файл
             ifstream in(path);
             if (!in) {
-                cout << "Не удалось открыть файл: " << path << "\n";
+                cout << "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»: " << path << "\n";
                 continue;
             }
 
-            // Читаем данные из файла
             data = readFromFile(path);
             if (data.empty()) {
-                cout << "Файл пуст или не удалось загрузить числовые данные.\n";
+                cout << "Р¤Р°Р№Р» РїСѓСЃС‚ РёР»Рё РЅРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С‡РёСЃР»РѕРІС‹Рµ РґР°РЅРЅС‹Рµ.\n";
                 continue;
             }
+            break;
         }
-        else {
-            cout << "Неверный выбор\n";
+
+        default:
+            cout << "РќРµРІРµСЂРЅС‹Р№ РІС‹Р±РѕСЂ\n";
             continue;
         }
 
-        // Если массив пустой, возвращаемся в меню
+        // Р’ РјРµС‚РѕРґРµ run() РїРѕСЃР»Рµ switch-case РґРѕР±Р°РІРёС‚СЊ:
+// Р•СЃР»Рё РјР°СЃСЃРёРІ РїСѓСЃС‚РѕР№, РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ РІ РјРµРЅСЋ
         if (data.empty()) {
-            cout << "Массив пуст.\n";
+            cout << "РњР°СЃСЃРёРІ РїСѓСЃС‚.\n";
             continue;
         }
 
-        cout << "Исходный массив:\n";
+        // РЎРѕС…СЂР°РЅСЏРµРј РѕСЂРёРіРёРЅР°Р»СЊРЅС‹Р№ РјР°СЃСЃРёРІ
+        vector<int> originalData = data;
+
+        cout << "РСЃС…РѕРґРЅС‹Р№ РјР°СЃСЃРёРІ (" << data.size() << " СЌР»РµРјРµРЅС‚РѕРІ):\n";
         printVector(data);
 
-        // Выполнение сортировки
+        // Р’С‹РїРѕР»РЅРµРЅРёРµ СЃРѕСЂС‚РёСЂРѕРІРєРё
         BlockSorter::sort(data);
 
-        cout << "Отсортированный массив:\n";
+        cout << "РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјР°СЃСЃРёРІ:\n";
         printVector(data);
 
-        bool save = askYesNo("Сохранить результат в файл? (y/n): ");
+        bool save = askYesNo("РЎРѕС…СЂР°РЅРёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚ РІ С„Р°Р№Р»? (y/n): ");
         if (save) {
             string outpath;
-            // Очищаем буфер перед вводом пути для сохранения
+            // РћС‡РёС‰Р°РµРј Р±СѓС„РµСЂ РїРµСЂРµРґ РІРІРѕРґРѕРј РїСѓС‚Рё РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             while (true) {
-                cout << "Введите путь для сохранения: ";
+                cout << "Р’РІРµРґРёС‚Рµ РїСѓС‚СЊ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ: ";
                 if (!getline(cin, outpath)) {
-                    cout << "Ошибка чтения пути.\n";
+                    cout << "РћС€РёР±РєР° С‡С‚РµРЅРёСЏ РїСѓС‚Рё.\n";
                     break;
                 }
 
-                // Удаляем пробелы в начале и конце строки
+                // РЈРґР°Р»СЏРµРј РїСЂРѕР±РµР»С‹ РІ РЅР°С‡Р°Р»Рµ Рё РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё
                 outpath.erase(0, outpath.find_first_not_of(" \t\n\r\f\v"));
                 outpath.erase(outpath.find_last_not_of(" \t\n\r\f\v") + 1);
 
                 if (outpath.empty()) {
-                    cout << "Путь для сохранения не может быть пустым.\n";
+                    cout << "РџСѓС‚СЊ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.\n";
                     continue;
                 }
 
                 if (isReservedWindowsName(outpath)) {
-                    cout << "Ошибка: имя файла зарезервировано системой. Выберите другое имя.\n";
+                    cout << "РћС€РёР±РєР°: РёРјСЏ С„Р°Р№Р»Р° Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРѕ СЃРёСЃС‚РµРјРѕР№. Р’С‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕРµ РёРјСЏ.\n";
                     continue;
                 }
 
-                // попытка открыть для записи
+                // РїРѕРїС‹С‚РєР° РѕС‚РєСЂС‹С‚СЊ РґР»СЏ Р·Р°РїРёСЃРё
                 ofstream test(outpath, ios::out);
                 if (!test) {
-                    cout << "Не удалось открыть файл для записи: " << outpath << "\n";
+                    cout << "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё: " << outpath << "\n";
                     continue;
                 }
                 test.close();
 
-                // если всё OK, записываем
-                writeToFile(outpath, data);
-                cout << "Файл сохранён.\n";
+                // РµСЃР»Рё РІСЃС‘ OK, Р·Р°РїРёСЃС‹РІР°РµРј РѕР±Р° РјР°СЃСЃРёРІР°
+                writeToFile(outpath, originalData, data);
+                cout << "Р¤Р°Р№Р» СЃРѕС…СЂР°РЅС‘РЅ.\n";
                 break;
             }
         }
 
-        // После обработки пункта меню возвращаемся к меню
+        // РџРѕСЃР»Рµ РѕР±СЂР°Р±РѕС‚РєРё РїСѓРЅРєС‚Р° РјРµРЅСЋ РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ Рє РјРµРЅСЋ
         cout << "\n";
     }
-
-    return 0;
 }
+
 std::vector<int> App::readFromFile(const std::string& path) const {
     std::vector<int> v;
     std::ifstream in(path);
     if (!in) return v;
-    double xd;
-    while (in >> xd) {
-        int scaled = (int)std::lround(xd * 100.0);
+
+    // Р§РёС‚Р°РµРј С‡РёСЃР»Р° (С†РµР»С‹Рµ РёР»Рё РґСЂРѕР±РЅС‹Рµ)
+    double num;
+    while (in >> num) {
+        // РЈРјРЅРѕР¶Р°РµРј РЅР° 100 Рё РѕРєСЂСѓРіР»СЏРµРј РґР»СЏ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ С…СЂР°РЅРµРЅРёСЏ
+        int scaled = static_cast<int>(std::lround(num * 100.0));
         v.push_back(scaled);
     }
     return v;
 }
-
-void App::writeToFile(const std::string& path, const std::vector<int>& v) const {
+void App::writeToFile(const std::string& path,
+    const std::vector<int>& original,
+    const std::vector<int>& sorted) const {
     std::ofstream out(path);
-    for (size_t i = 0; i < v.size(); ++i) {
-        double val = v[i] / 100.0;
-        out << std::fixed << std::setprecision(2) << val;
-        if (i + 1 < v.size()) out << " ";
+    if (!out) {
+        std::cerr << "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° РґР»СЏ Р·Р°РїРёСЃРё: " << path << std::endl;
+        return;
     }
+
+    // Р—Р°РїРёСЃС‹РІР°РµРј Р·Р°РіРѕР»РѕРІРѕРє Рё РёСЃС…РѕРґРЅС‹Р№ РјР°СЃСЃРёРІ
+    out << "РСЃС…РѕРґРЅС‹Р№ РјР°СЃСЃРёРІ (" << original.size() << " СЌР»РµРјРµРЅС‚РѕРІ):\n";
+    for (size_t i = 0; i < original.size(); ++i) {
+        if (i) out << " ";
+        double val = original[i] / 100.0;
+        out << val;
+    }
+    out << "\n\n";
+
+    // Р—Р°РїРёСЃС‹РІР°РµРј Р·Р°РіРѕР»РѕРІРѕРє Рё РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјР°СЃСЃРёРІ
+    out << "РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјР°СЃСЃРёРІ:\n";
+    for (size_t i = 0; i < sorted.size(); ++i) {
+        if (i) out << " ";
+        double val = sorted[i] / 100.0;
+        out << val;
+    }
+    out << "\n";
 }
 
 void App::printVector(const std::vector<int>& v) const {
     for (size_t i = 0; i < v.size(); ++i) {
         if (i) std::cout << " ";
+        // РљРѕРЅРІРµСЂС‚РёСЂСѓРµРј РѕР±СЂР°С‚РЅРѕ РІ РґСЂРѕР±РЅРѕРµ С‡РёСЃР»Рѕ РґР»СЏ РІС‹РІРѕРґР°
         double val = v[i] / 100.0;
-        std::cout << std::fixed << std::setprecision(2) << val;
+        std::cout << val;
     }
     std::cout << '\n';
 }
